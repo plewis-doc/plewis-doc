@@ -1,0 +1,6 @@
+// PDL 03OCT2022
+ZPAEvent
+//| take 25
+| project Application,  Host, DstUserName, SrcDvcHostname, ZENBytesRxClient , ZENBytesTxClient
+| summarize Apps = count(Application), Transmit = sum(ZENBytesRxClient) ,Receive = sum(ZENBytesTxClient) by DstUserName,Application, Host
+| sort by DstUserName, Application
