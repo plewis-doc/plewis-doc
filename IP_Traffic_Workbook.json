@@ -72,9 +72,8 @@
       }
     }
   ],
-  "fallbackResourceIds": [
-    "/subscriptions/5d687dbf-3f77-4e33-96e8-88dec45e179a/resourcegroups/rg-sentinel-hub-east/providers/microsoft.operationalinsights/workspaces/log-sentinel-hub-east"
-  ],
+  "fallbackResourceIds": []
+    ,
   "fromTemplateId": "sentinel-UserWorkbook",
   "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
 }
