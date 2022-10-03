@@ -1,0 +1,80 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "union isfuzzy=true\r\n    (W3CIISLog\r\n    | extend\r\n        TrafficDirection = \"InboundOrUnknown\",\r\n        Country=RemoteIPCountry,\r\n        Latitude=RemoteIPLatitude,\r\n        Longitude=RemoteIPLongitude),\r\n    (DnsEvents\r\n    | extend\r\n        TrafficDirection = \"InboundOrUnknown\",\r\n        Country= RemoteIPCountry,\r\n        Latitude = RemoteIPLatitude,\r\n        Longitude = RemoteIPLongitude),\r\n    (WindowsFirewall\r\n    | extend\r\n        TrafficDirection = iff(CommunicationDirection != \"SEND\", \"InboundOrUnknown\", \"Outbound\"),\r\n        Country=MaliciousIPCountry,\r\n        Latitude=MaliciousIPLatitude,\r\n        Longitude=MaliciousIPLongitude),\r\n    (CommonSecurityLog\r\n    | extend\r\n        TrafficDirection = iff(CommunicationDirection !in (\"Outbound\", \"1\"), \"InboundOrUnknown\", \"Outbound\"),\r\n        Country=MaliciousIPCountry,\r\n        Latitude=MaliciousIPLatitude,\r\n        Longitude=MaliciousIPLongitude,\r\n        Confidence=ThreatDescription,\r\n        Description=ThreatDescription),\r\n    (VMConnection\r\n    | where Type == \"VMConnection\"\r\n    | extend\r\n        TrafficDirection = iff(Direction != \"outbound\", \"InboundOrUnknown\", \"Outbound\"),\r\n        Country=RemoteCountry,\r\n        Latitude=RemoteLatitude,\r\n        Longitude=RemoteLongitude,\r\n        MaliciousIP=MaliciousIp)\r\n| where isnotempty(MaliciousIP)\r\n    and isnotempty(Country)\r\n    and isnotempty(Latitude)\r\n    and isnotempty(Longitude)  \r\n| project TimeGenerated, sSiteName, sIP, csMethod, csUriStem, csUriQuery, csReferer, scStatus, MaliciousIP, RemoteIPCountry, Computer, Type",
+        "size": 0,
+        "title": "Maliscious IPs",
+        "noDataMessage": "No Data for the past hour....",
+        "timeContext": {
+          "durationMs": 43200000
+        },
+        "showRefreshButton": true,
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "TimeGenerated",
+              "formatter": 6
+            }
+          ],
+          "rowLimit": 25,
+          "filter": true
+        }
+      },
+      "name": "Malicious - IP",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ZPAEvent\r\n//| take 25\r\n//| extend Used = Application\r\n| project Application,  Host, DstUserName, SrcDvcHostname, ZENBytesRxClient , ZENBytesTxClient\r\n| summarize Apps = count(Application), Transmit = sum(ZENBytesRxClient) ,Receive = sum(ZENBytesTxClient) by DstUserName,Application, Host\r\n| sort by DstUserName, Application\r\n",
+        "size": 0,
+        "title": "ZPA - AppConnector Utilzation",
+        "timeContext": {
+          "durationMs": 14400000
+        },
+        "showRefreshButton": true,
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Transmit",
+              "formatter": 0,
+              "formatOptions": {
+                "aggregation": "Sum"
+              }
+            },
+            {
+              "columnMatch": "Receive",
+              "formatter": 0,
+              "formatOptions": {
+                "aggregation": "Sum"
+              }
+            }
+          ],
+          "filter": true
+        }
+      },
+      "name": "ZPA-App Connector Usage",
+      "styleSettings": {
+        "showBorder": true
+      }
+    }
+  ],
+  "fallbackResourceIds": [
+    "/subscriptions/5d687dbf-3f77-4e33-96e8-88dec45e179a/resourcegroups/rg-sentinel-hub-east/providers/microsoft.operationalinsights/workspaces/log-sentinel-hub-east"
+  ],
+  "fromTemplateId": "sentinel-UserWorkbook",
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
