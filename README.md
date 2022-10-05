@@ -1,8 +1,8 @@
-- 👋 Hi, I’m @plewis-doc
-- 👀 I’m interested in .. living...
+- 👋 Hi, I’m @plewis-doc (Paul)
+
 - 🌱 I’m currently learning ... Azure Sentinel - KQL - and Log Analytics
-- 💞️ I’m looking to collaborate on ...
-- 📫 How to reach me ...
+-
+- 📫 How to reach me ... tow2gunner@gmail.com or plewis@oig.doc.gov
 
 <!---
 plewis-doc/plewis-doc is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
