@@ -1,0 +1,190 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "CommonSecurityLog \r\n//| where DeviceEventClassID !contains \"Allow\" //and AdditionalExtensions contains \"username@dom.com\"\r\n| where TimeGenerated > ago(365d)\r\n| where DeviceCustomString2 == \"FileHost\"\r\n| project TimeGenerated, DeviceAction, DestinationServiceName,RequestContext, DestinationHostName, DestinationIP, FileType, SentBytes, SourceUserName, DeviceCustomString1\r\n| summarize count() by DestinationHostName, RequestContext, DestinationIP, FileType, SentBytes, SourceUserName, TimeGenerated, DeviceCustomString1",
+        "size": 0,
+        "title": "External File Sharing Report (ZIA: Rule = FileHost)",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "showRefreshButton": true,
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "filter": true
+        }
+      },
+      "name": "External File Sharing Report (ZIA: Rule = FileHost)",
+      "styleSettings": {
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "CommonSecurityLog \r\n//| where DeviceEventClassID !contains \"Allow\" //and AdditionalExtensions contains \"username@dom.com\"\r\n| where TimeGenerated > ago(365d)\r\n| where DeviceCustomString2 == \"FileHost\"\r\n| project TimeGenerated, DeviceAction, DestinationServiceName,RequestContext, DestinationHostName, DestinationIP, FileType, FileSize, SourceUserName, DeviceCustomString1\r\n//| summarize count() by DestinationHostName, RequestContext, DestinationIP, FileType, FileSize, SourceUserName, TimeGenerated, DeviceCustomString1\r\n| summarize Total = count() by DestinationServiceName",
+        "size": 0,
+        "showAnalytics": true,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "showRefreshButton": true,
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "sortBy": [],
+        "tileSettings": {
+          "showBorder": false,
+          "titleContent": {
+            "columnMatch": "DeviceCustomString1",
+            "formatter": 1
+          },
+          "leftContent": {
+            "columnMatch": "count_",
+            "formatter": 12,
+            "formatOptions": {
+              "palette": "auto"
+            },
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        },
+        "graphSettings": {
+          "type": 0,
+          "topContent": {
+            "columnMatch": "DeviceCustomString1",
+            "formatter": 1
+          },
+          "centerContent": {
+            "columnMatch": "count_",
+            "formatter": 1,
+            "numberFormat": {
+              "unit": 17,
+              "options": {
+                "maximumSignificantDigits": 3,
+                "maximumFractionDigits": 2
+              }
+            }
+          }
+        }
+      },
+      "customWidth": "20",
+      "name": "Usage by Service:",
+      "styleSettings": {
+        "maxWidth": "25",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "CommonSecurityLog \r\n//| where DeviceEventClassID !contains \"Allow\" //and AdditionalExtensions contains \"username@dom.com\"\r\n| where TimeGenerated > ago(365d)\r\n| where DeviceCustomString2 == \"FileHost\"\r\n| project TimeGenerated, DeviceAction, DestinationServiceName,RequestContext, DestinationHostName, DestinationIP, FileType, FileSize, SourceUserName, DeviceCustomString1\r\n//| summarize count() by DestinationHostName, RequestContext, DestinationIP, FileType, FileSize, SourceUserName, TimeGenerated, DeviceCustomString1\r\n| summarize Total = count() by DeviceCustomString1",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "showRefreshButton": true,
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart"
+      },
+      "customWidth": "20",
+      "name": "Usage by Department:",
+      "styleSettings": {
+        "maxWidth": "25",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "CommonSecurityLog \r\n//| where DeviceEventClassID !contains \"Allow\" //and AdditionalExtensions contains \"username@dom.com\"\r\n| where TimeGenerated > ago(365d)\r\n| where DeviceCustomString2 == \"FileHost\"\r\n| project TimeGenerated, DeviceAction, DestinationServiceName,RequestContext, DestinationHostName, DestinationIP, FileType, FileSize, SourceUserName, DeviceCustomString1\r\n//| summarize count() by DestinationHostName, RequestContext, DestinationIP, FileType, FileSize, SourceUserName, TimeGenerated, DeviceCustomString1\r\n| summarize Total = count() by FileType",
+        "size": 0,
+        "title": "File Tpye Distribution",
+        "showRefreshButton": true,
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart",
+        "gridSettings": {
+          "filter": true
+        }
+      },
+      "customWidth": "20",
+      "name": "File Type Distribution",
+      "styleSettings": {
+        "maxWidth": "25",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "CommonSecurityLog \r\n//| where DeviceEventClassID !contains \"Allow\" //and AdditionalExtensions contains \"username@dom.com\"\r\n| where TimeGenerated > ago(365d)\r\n| where DeviceCustomString2 == \"FileHost\"\r\n| where FileType != \"None\"\r\n| project TimeGenerated, DeviceAction, DestinationServiceName,RequestContext, DestinationHostName, DestinationIP, FileType, SentBytes, SourceUserName, DeviceCustomString1\r\n//| summarize count() by DestinationHostName, RequestContext, DestinationIP, FileType, FileSize, SourceUserName, TimeGenerated, DeviceCustomString1\r\n//| summarize count() by FileType, Size = sum(formatbytes(SentBytes),2), DeviceCustomString1 \r\n| summarize Size = format_bytes(sum(SentBytes)) by DeviceCustomString1",
+        "size": 0,
+        "title": "Transfer Size (By Department",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "showRefreshButton": true,
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "filter": true
+        }
+      },
+      "customWidth": "20",
+      "name": "Transfer Size (By Department",
+      "styleSettings": {
+        "maxWidth": "25",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "CommonSecurityLog \r\n//| where DeviceEventClassID !contains \"Allow\" //and AdditionalExtensions contains \"username@dom.com\"\r\n| where TimeGenerated > ago(365d)\r\n| where DeviceCustomString2 == \"FileHost\"\r\n| where FileType != \"None\"\r\n| project TimeGenerated, DeviceAction, DestinationServiceName,RequestContext, DestinationHostName, DestinationIP, FileType, FileSize, SourceUserName, DeviceCustomString1\r\n//| summarize count() by DestinationHostName, RequestContext, DestinationIP, FileType, FileSize, SourceUserName, TimeGenerated, DeviceCustomString1\r\n| summarize Total = count() by FileType, DeviceCustomString1",
+        "size": 0,
+        "title": "File Tpye Distribution by Department",
+        "showRefreshButton": true,
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "filter": true
+        }
+      },
+      "customWidth": "35",
+      "name": "File Type Distribution - By Department",
+      "styleSettings": {
+        "maxWidth": "50",
+        "showBorder": true
+      }
+    }
+  ],
+  "fallbackResourceIds": [
+    "/subscriptions/[SUBSCRIPTION]/resourcegroups/[RESOURCE-GROUP]/providers/microsoft.operationalinsights/workspaces/log-sentinel-hub-east"
+  ],
+  "fromTemplateId": "sentinel-UserWorkbook",
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+}
