@@ -1,0 +1,305 @@
+// Notebook - Sentinel : Protection Status v1.0
+// Removed info from fallbackResourceIds
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 9,
+      "content": {
+        "version": "KqlParameterItem/1.0",
+        "parameters": [
+          {
+            "id": "8eeac0b8-5a2d-42b4-8194-dfe74de618b4",
+            "version": "KqlParameterItem/1.0",
+            "name": "OSName",
+            "type": 2,
+            "multiSelect": true,
+            "quote": "'",
+            "delimiter": ",",
+            "query": "ProtectionStatus\r\n//| distinct Computer\r\n| where TimeGenerated >=ago(2h)\r\n| distinct OSName",
+            "typeSettings": {
+              "additionalResourceOptions": [
+                "value::1",
+                "value::all"
+              ]
+            },
+            "timeContext": {
+              "durationMs": 86400000
+            },
+            "defaultValue": "value::all",
+            "queryType": 0,
+            "resourceType": "microsoft.operationalinsights/workspaces",
+            "value": [
+              "value::all"
+            ]
+          }
+        ],
+        "style": "pills",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces"
+      },
+      "customWidth": "15",
+      "name": "parameters - 1",
+      "styleSettings": {
+        "maxWidth": "20",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ProtectionStatus\r\n//| distinct DeviceName\r\n| where TimeGenerated >=ago(2h)\r\n| extend LastUpdate = TimeGenerated - now()\r\n|summarize arg_max(TimeGenerated, ProtectionStatus, LastUpdate,ThreatStatus, ThreatStatusDetails, TypeofProtection, {OSName}) by DeviceName\r\n| sort by   LastUpdate, {OSName}, TypeofProtection,TimeGenerated, ProtectionStatus,DeviceName, ThreatStatus, ThreatStatusDetails\r\n| project  LastUpdate, {OSName}, TypeofProtection,TimeGenerated, ProtectionStatus,DeviceName, ThreatStatus, ThreatStatusDetails;",
+        "size": 0,
+        "title": "Machine Protection Status",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "showRefreshButton": true,
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "LastUpdate",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "23ch"
+              }
+            },
+            {
+              "columnMatch": "Column1",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "Column2",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "Column3",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "Column4",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "Column5",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "TypeofProtection",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "43ch"
+              }
+            },
+            {
+              "columnMatch": "TimeGenerated",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "26.5714ch"
+              }
+            },
+            {
+              "columnMatch": "ProtectionStatus",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "30ch"
+              }
+            },
+            {
+              "columnMatch": "DeviceName",
+              "formatter": 0,
+              "formatOptions": {
+                "aggregation": "Count",
+                "customColumnWidthSetting": "41.5714ch"
+              }
+            },
+            {
+              "columnMatch": "ThreatStatus",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "25ch"
+              }
+            },
+            {
+              "columnMatch": "ThreatStatusDetails",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "58.4286ch"
+              }
+            },
+            {
+              "columnMatch": "Status",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "30ch"
+              }
+            },
+            {
+              "columnMatch": "Last Report Time",
+              "formatter": 6
+            }
+          ],
+          "sortBy": [
+            {
+              "itemKey": "DeviceName",
+              "sortOrder": 1
+            }
+          ]
+        },
+        "sortBy": [
+          {
+            "itemKey": "DeviceName",
+            "sortOrder": 1
+          }
+        ]
+      },
+      "customWidth": "60",
+      "name": "Machine Protection Status",
+      "styleSettings": {
+        "maxWidth": "75",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ProtectionStatus\r\n| where TimeGenerated >=ago(2h)\r\n| extend LastUpdate = TimeGenerated - now()\r\n| summarize count() by OSName\r\n",
+        "size": 1,
+        "title": "Total Device by OS Reporting",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "OS Name",
+              "formatter": 2
+            },
+            {
+              "columnMatch": "Total",
+              "formatter": 0,
+              "formatOptions": {
+                "customColumnWidthSetting": "15"
+              }
+            }
+          ],
+          "filter": true
+        }
+      },
+      "customWidth": "20",
+      "name": "Total Device by OS Reporting",
+      "styleSettings": {
+        "maxWidth": "25",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ProtectionStatus\r\n| where TimeGenerated >=ago(2h)\r\n| extend LastUpdate = TimeGenerated - now()\r\n|summarize arg_max(TimeGenerated, ProtectionStatus, LastUpdate,ThreatStatus, ThreatStatusDetails, TypeofProtection, OSName) by DeviceName\r\n| sort by   LastUpdate, OSName, TypeofProtection,TimeGenerated, ProtectionStatus,DeviceName, ThreatStatus, ThreatStatusDetails\r\n| project  LastUpdate, OSName, TypeofProtection,TimeGenerated, ProtectionStatus,DeviceName, ThreatStatus, ThreatStatusDetails;",
+        "size": 0,
+        "title": "Status - All Devices (last 2 hrs)",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "showRefreshButton": true,
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "table",
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "OSName",
+              "formatter": 0,
+              "formatOptions": {
+                "aggregation": "Unique"
+              }
+            }
+          ],
+          "filter": true
+        }
+      },
+      "customWidth": "60",
+      "name": "Status - All Devices (last 2 hrs)",
+      "styleSettings": {
+        "maxWidth": "80",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ProtectionStatus\r\n| where TimeGenerated >=ago(2h)\r\n| where  ProtectionStatus !=\"Real time protection\"\r\n| extend LastUpdate = TimeGenerated - now()\r\n|summarize arg_max(TimeGenerated, ProtectionStatus, LastUpdate,ThreatStatus, ThreatStatusDetails, TypeofProtection, OSName) by DeviceName\r\n| sort by   LastUpdate, OSName, TypeofProtection,TimeGenerated, ProtectionStatus,DeviceName, ThreatStatus, ThreatStatusDetails\r\n| summarize TypeProt = count(TypeofProtection)by OSName\r\n| project  OSName, TypeProt //LastUpdate, TimeGenerated, ProtectionStatus,DeviceName, ThreatStatus, ThreatStatusDetails\r\n",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart"
+      },
+      "customWidth": "20",
+      "name": "query - 4",
+      "styleSettings": {
+        "maxWidth": "20",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ProtectionStatus\r\n| where TimeGenerated >=ago(2h)\r\n| where  ProtectionStatus !=\"Real time protection\"\r\n| extend LastUpdate = TimeGenerated - now()\r\n|summarize arg_max(TimeGenerated, ProtectionStatus, LastUpdate,ThreatStatus, ThreatStatusDetails, TypeofProtection, OSName) by DeviceName\r\n| sort by   LastUpdate, OSName, TypeofProtection,TimeGenerated, ProtectionStatus,DeviceName, ThreatStatus, ThreatStatusDetails\r\n| summarize count() by TypeofProtection \r\n//| project  OSName, TypeProt //LastUpdate, TimeGenerated, ProtectionStatus,DeviceName, ThreatStatus, ThreatStatusDetails\r\n",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "visualization": "piechart"
+      },
+      "customWidth": "20",
+      "name": "query - 4 - Copy",
+      "styleSettings": {
+        "maxWidth": "20",
+        "showBorder": true
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "ProtectionStatus\r\n//| distinct DeviceName\r\n| where TimeGenerated >=ago(2h)\r\n| where  ProtectionStatus !=\"Real time protection\"\r\n| extend LastUpdate = TimeGenerated - now()\r\n|summarize arg_max(TimeGenerated, ProtectionStatus, LastUpdate,ThreatStatus, ThreatStatusDetails, TypeofProtection, OSName) by DeviceName\r\n| sort by   ProtectionStatus,LastUpdate, OSName, TypeofProtection,TimeGenerated, DeviceName, ThreatStatus, ThreatStatusDetails\r\n| project   LastUpdate, OSName, TypeofProtection,TimeGenerated, ProtectionStatus,DeviceName, ThreatStatus, ThreatStatusDetails;",
+        "size": 0,
+        "title": "Protection Status - Needs Attention",
+        "timeContext": {
+          "durationMs": 86400000
+        },
+        "showRefreshButton": true,
+        "showExportToExcel": true,
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "gridSettings": {
+          "filter": true
+        }
+      },
+      "name": "Protection Status - Needs Attention"
+    }
+  ],
+  "fallbackResourceIds": [
+    ""
+  ],
+  "fromTemplateId": "sentinel-UserWorkbook",
+  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
