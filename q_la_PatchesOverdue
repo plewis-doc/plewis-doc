@@ -1,0 +1,14 @@
+// Will show Days.HOURS:MIN a Patch is overdue (PubDate - now) and the KBID and Product
+Update
+| where Computer contains "XXXXXX.XXXXX" // Update with you DNS/Domain Name
+    and ComputerEnvironment == "Non-Azure"
+    and UpdateState != "Installed"
+    and Classification !contains "Drivers"
+    and Title !contains "Feature update to Windows "
+    and Product !contains "Microsoft Defender Antivirus"
+| extend OverDue = ( now() - PublishedDate )
+| project Computer, Classification, KBID, Product, Title, PublishedDate, OverDue //= PublishedDate - now(), OSVersion
+| distinct Classification, KBID, Computer, Product, Title, PublishedDate, format_timespan(OverDue, 'ddd.hh:mm') // = PublishedDate - now()
+| order by  OverDue desc,  PublishedDate, Product asc, KBID desc, Computer desc, Classification asc //, 'ddd.hh:mm') //= PublishedDate - now() asc
+| project-reorder OverDue, PublishedDate, Product , KBID , Computer , Classification 
+| summarize count(OverDue) by OverDue, KBID, Product
