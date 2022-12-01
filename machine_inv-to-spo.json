@@ -23,7 +23,7 @@
                         }
                     },
                     "method": "post",
-                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent('https://SHAREPOINT/PATH/TO/LIBRARY'))}/files",
+                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent('https://SHAREPOINT/_PATH/TO/LIBRARY'))}/files",
                     "queries": {
                         "folderPath": "/FOLDER",
                         "name": "MachineInventory_@{utcNow()}.csv",
