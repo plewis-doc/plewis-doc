@@ -23,9 +23,9 @@
                         }
                     },
                     "method": "post",
-                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent('https://oigdocprod.sharepoint.com/sites/Restricted_OCIO'))}/files",
+                    "path": "/datasets/@{encodeURIComponent(encodeURIComponent('https://SHAREPOINT/PATH/TO/LIBRARY'))}/files",
                     "queries": {
-                        "folderPath": "/ATO Documents/Machine Inventory",
+                        "folderPath": "/FOLDER",
                         "name": "MachineInventory_@{utcNow()}.csv",
                         "queryParametersSingleEncoded": true
                     }
@@ -44,7 +44,7 @@
             },
             "Run_query_and_list_results": {
                 "inputs": {
-                    "body": "// Returns list of Devices and then generates an html file\n//    that is saved to the OCIO/PRIV/ATO Folder\n//   Paul Lewis/Jason Pringle - 30NOV2022\nDeviceNetworkInfo\n| join DeviceInfo on DeviceName\n| where TimeGenerated <ago(5m)\n| extend ipa = todynamic(IPAddresses)\n| mv-expand ipa\n| extend ipb = ipa.IPAddress\n| extend ipc = ipa.SubnetPrefix\n| where ipb !contains \"fe80:\" or ipb !startswith \"2600:\"\n| where MachineGroup contains \"Prod\" or MachineGroup contains \"Unassigned\" or MachineGroup contains \"DMZ\"\n| where ipc == 16 or ipc == 24\n| project TimeGenerated, DeviceName, IP = ipb, CIDR = ipc, MacAddress, MachineGroup, DnsAddresses, OSPlatform, PublicIP, NetworkAdapterName\n| order by TimeGenerated desc, DeviceName desc\n| distinct DeviceName, MachineGroup, MacAddress, tostring(IP), tostring(CIDR), tostring(DnsAddresses), OSPlatform, PublicIP, NetworkAdapterName\n",
+                    "body": "// Returns list of Devices and then generates an html file\n//    that is saved to folder\n//   Paul Lewis/Jason Pringle - 30NOV2022\nDeviceNetworkInfo\n| join DeviceInfo on DeviceName\n| where TimeGenerated <ago(5m)\n| extend ipa = todynamic(IPAddresses)\n| mv-expand ipa\n| extend ipb = ipa.IPAddress\n| extend ipc = ipa.SubnetPrefix\n| where ipb !contains \"fe80:\" or ipb !startswith \"2600:\"\n| where MachineGroup contains \"Prod\" or MachineGroup contains \"Unassigned\" or MachineGroup contains \"DMZ\"\n| where ipc == 16 or ipc == 24\n| project TimeGenerated, DeviceName, IP = ipb, CIDR = ipc, MacAddress, MachineGroup, DnsAddresses, OSPlatform, PublicIP, NetworkAdapterName\n| order by TimeGenerated desc, DeviceName desc\n| distinct DeviceName, MachineGroup, MacAddress, tostring(IP), tostring(CIDR), tostring(DnsAddresses), OSPlatform, PublicIP, NetworkAdapterName\n",
                     "host": {
                         "connection": {
                             "name": "@parameters('$connections')['azuremonitorlogs']['connectionId']"
@@ -56,7 +56,7 @@
                         "resourcegroups": "rg-Sentinel-hub-east",
                         "resourcename": "log-Sentinel-hub-east",
                         "resourcetype": "Log Analytics Workspace",
-                        "subscriptions": "5d687dbf-3f77-4e33-96e8-88dec45e179a",
+                        "subscriptions": "SUBID",
                         "timerange": "ago(5m)"
                     }
                 },
