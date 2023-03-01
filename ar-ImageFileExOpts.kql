@@ -1,0 +1,50 @@
+// Analytics Rule : Persisting via RegKey (IFEO)
+// Thanks to the basics of this query to Robert Finn (robertfinn@microsoft.com and the Microsoft Security Team)
+// This gives lots of false positives as is. - under the _ImRegistry Table - I am workgin to limit to entries  whcih have any specific Key set
+// Having an entry in \\REGISTRY\\MACHINE, "Image File Execution Options" does automatically make it "bad"
+//  Date: 28FEB2023 v0.2
+(union isfuzzy=true
+(
+SecurityEvent
+| where EventID == 4657
+| where ObjectName has_all (\\REGISTRY\\MACHINE, "Image File Execution Options")
+| where ObjectName !endswith "Image File Execution Options"
+| summarize Count=count() by Computer, Account, ObjectName
+| top 10 by Count desc 
+| extend AccountCustomEntity = Account, HostCustomEntity = Computer
+),
+(
+WindowsEvent
+| where EventID == 4657 and EventData has_all (\\REGISTRY\\MACHINE, "Image File Execution Options")
+| extend ObjectName = tostring(EventData.ObjectName)
+| where ObjectName has_all (\\REGISTRY\\MACHINE, "Image File Execution Options")
+| where ObjectName !endswith "Image File Execution Options"
+| extend Account =  strcat(tostring(EventData.SubjectDomainName),"\\", tostring(EventData.SubjectUserName))
+| summarize Count=count() by Computer, Account, ObjectName
+| top 10 by Count desc 
+| extend AccountCustomEntity = Account, HostCustomEntity = Computer
+),
+(
+Event
+| where Source == "Microsoft-Windows-Sysmon"
+| where EventID in (12, 13)
+| extend EventData = parse_xml(EventData).DataItem.EventData.Data
+| mv-expand bagexpansion=array EventData
+| evaluate bag_unpack(EventData)
+| extend Key=tostring(['@Name']), Value=['#text']
+| evaluate pivot(Key, any(Value), TimeGenerated, Source, EventLog, Computer, EventLevel, EventLevelName, EventID, UserName, RenderedDescription, MG, ManagementGroupName, Type, _ResourceId)
+| where TargetObject has_all ("HKLM", "Image File Execution Options")
+| summarize Count=count() by Computer, UserName, tostring(TargetObject)
+| top 10 by Count desc
+| extend AccountCustomEntity = UserName, HostCustomEntity = Computer
+),
+(
+imRegistry
+| where RegistryKey has_all ("HKEY_LOCAL_MACHINE", "Image File Execution Options", "Debugger")
+or RegistryKey has_all ("HKEY_LOCAL_MACHINE", "Image File Execution Options", "SilentProcessExit")
+or RegistryKey has_all ("HKEY_LOCAL_MACHINE", "Image File Execution Options", "GlobalFlags")
+| summarize Count=count() by Dvc, Username, RegistryKey
+| top 10 by Count desc
+| extend AccountCustomEntity = Username, HostCustomEntity = Dvc
+)
+)
