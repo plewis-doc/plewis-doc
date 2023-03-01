@@ -1,0 +1,7 @@
+// Examine Reg Keys for the existance of potential items  with
+// GlobalFlags, SilentProcessExit, Debugger Keys set.
+DeviceRegistryEvents
+| where Timestamp >ago(90d)
+//| where DEvinceName contain”XXXXXX”
+//| where RegistryKey contains "Image File Execution Options" //and RegistryValueName has_any ("Silent", "GlobalFlags", "SilentProcessExit")
+| where RegistryKey has_any ("Image File", "Options", "GlobalFlags", "Debugger", "SilentProcessExit")
