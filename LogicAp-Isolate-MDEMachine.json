@@ -1,0 +1,230 @@
+## Isolate-Machine-MDE
+{
+    "definition": {
+        "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+        "actions": {
+            "Entities_-_Get_Hosts": {
+                "inputs": {
+                    "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/entities/host"
+                },
+                "runAfter": {
+                    "Send_an_email_(V2)_3": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "ApiConnection"
+            },
+            "For_each": {
+                "actions": {
+                    "Condition": {
+                        "actions": {
+                            "Add_comment_to_incident_(V3)": {
+                                "inputs": {
+                                    "body": {
+                                        "incidentArmId": "@triggerBody()?['object']?['id']",
+                                        "message": "<p>@{items('For_each')?['HostName']} was isolated in MDE and the status was </p>"
+                                    },
+                                    "host": {
+                                        "connection": {
+                                            "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                        }
+                                    },
+                                    "method": "post",
+                                    "path": "/Incidents/Comment"
+                                },
+                                "runAfter": {
+                                    "HTTP": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "ApiConnection"
+                            },
+                            "For_each_2": {
+                                "actions": {
+                                    "Send_an_email_(V2)": {
+                                        "inputs": {
+                                            "body": {
+                                                "Body": "<p>Device has been Isolated in Security Portal. Rule was triggered and action taken automatically. Device will NOT be automatically released.<br>\nHelpdesk : This is an FYI if the user calls and has no network access<br>\nSecurity/Marvin : &nbsp;Check Portal(s)<br>\n@{triggerBody()?['object']?['id']}<br>\n@{triggerBody()?['object']?['properties']?['incidentUrl']}<br>\n@{triggerBody()?['object']?['properties']?['additionalData']?['alertsCount']}<br>\n@{items('For_each_2')}</p>",
+                                                "Importance": "High",
+                                                "Subject": "Device Isolated In MDE: @{items('For_each')?['HostName']}",
+                                                "To": "EMAIL-ADDRESSES"
+                                            },
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['office365']['connectionId']"
+                                                }
+                                            },
+                                            "method": "post",
+                                            "path": "/v2/Mail"
+                                        },
+                                        "runAfter": {},
+                                        "type": "ApiConnection"
+                                    }
+                                },
+                                "foreach": "@triggerBody()?['object']?['properties']?['Comments']",
+                                "runAfter": {
+                                    "Add_comment_to_incident_(V3)": [
+                                        "Succeeded"
+                                    ]
+                                },
+                                "type": "Foreach"
+                            },
+                            "HTTP": {
+                                "inputs": {
+                                    "authentication": {
+                                        "audience": "https://api-gcc.securitycenter.microsoft.us",
+                                        "type": "ManagedServiceIdentity"
+                                    },
+                                    "body": {
+                                        "Comment": "@{triggerBody()?['object']?['properties']?['incidentNumber']}@{triggerBody()?['object']?['properties']?['title']}",
+                                        "IsolationType": "Selective"
+                                    },
+                                    "method": "POST",
+                                    "uri": "https://api-gcc.securitycenter.microsoft.us/api/machines/@{items('For_each')?['additionalData']?['MdatpDeviceId']}/isolate"
+                                },
+                                "runAfter": {},
+                                "type": "Http"
+                            }
+                        },
+                        "else": {
+                            "actions": {
+                                "Add_comment_to_incident_(V3)_2": {
+                                    "inputs": {
+                                        "body": {
+                                            "incidentArmId": "@triggerBody()?['object']?['id']",
+                                            "message": "<p>@{items('For_each')?['HostName']} does not have MDEDeviceID in the Entities list. &nbsp;It was not isolated.&nbsp;</p>"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/Incidents/Comment"
+                                    },
+                                    "runAfter": {},
+                                    "type": "ApiConnection"
+                                },
+                                "Send_an_email_(V2)_2": {
+                                    "inputs": {
+                                        "body": {
+                                            "Body": "<p>Isolation Failed for the device. Please check (MDE) Security Center and Sentinel.</p>",
+                                            "Importance": "High",
+                                            "Subject": "Isolation Failed : @{items('For_each')?['HostName']} @{triggerBody()?['object']?['id']}",
+                                            "To": "EMAIL-ADDRESSES"
+                                        },
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['office365']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "path": "/v2/Mail"
+                                    },
+                                    "runAfter": {
+                                        "Add_comment_to_incident_(V3)_2": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection"
+                                }
+                            }
+                        },
+                        "expression": {
+                            "and": [
+                                {
+                                    "not": {
+                                        "equals": [
+                                            "@items('For_each')?['additionalData']?['MdatpDeviceId']",
+                                            "@null"
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        "runAfter": {},
+                        "type": "If"
+                    }
+                },
+                "foreach": "@body('Entities_-_Get_Hosts')?['Hosts']",
+                "runAfter": {
+                    "Entities_-_Get_Hosts": [
+                        "Succeeded"
+                    ]
+                },
+                "type": "Foreach"
+            },
+            "Send_an_email_(V2)_3": {
+                "inputs": {
+                    "body": {
+                        "Body": "<p>Machine Isolation Event - MDE</p>",
+                        "Importance": "High",
+                        "Subject": "Sentinel isolated a macgine in MDE",
+                        "To": "2027341547@vtext.com;4432064554@vtext.com;2027635397@vtext.com"
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['office365']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "path": "/v2/Mail"
+                },
+                "runAfter": {},
+                "type": "ApiConnection"
+            }
+        },
+        "contentVersion": "1.0.0.0",
+        "outputs": {},
+        "parameters": {
+            "$connections": {
+                "defaultValue": {},
+                "type": "Object"
+            }
+        },
+        "triggers": {
+            "Microsoft_Sentinel_incident": {
+                "inputs": {
+                    "body": {
+                        "callback_url": "@{listCallbackUrl()}"
+                    },
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                        }
+                    },
+                    "path": "/incident-creation"
+                },
+                "type": "ApiConnectionWebhook"
+            }
+        }
+    },
+    "parameters": {
+        "$connections": {
+            "value": {
+                "azuresentinel": {
+                    "connectionId": "/subscriptions/SUBSCRIPTION-ID/resourceGroups/rg-Sentinel-hub-east/providers/Microsoft.Web/connections/MicrosoftSentinel-Isolate-MDEMachine",
+                    "connectionName": "MicrosoftSentinel-Isolate-MDEMachine",
+                    "connectionProperties": {
+                        "authentication": {
+                            "type": "ManagedServiceIdentity"
+                        }
+                    },
+                    "id": "/subscriptions/5d687dbf-3f77-4e33-96e8-88dec45e179a/providers/Microsoft.Web/locations/eastus/managedApis/Azuresentinel"
+                },
+                "office365": {
+                    "connectionId": "/subscriptions/SUBSCRIPTION-ID/resourceGroups/rg-Sentinel-hub-east/providers/Microsoft.Web/connections/office365-Notify-GovernanceComplianceTeam",
+                    "connectionName": "office365-Notify-GovernanceComplianceTeam",
+                    "id": "/subscriptions/SUBSCRIPTION-ID/providers/Microsoft.Web/locations/eastus/managedApis/office365"
+                }
+            }
+        }
+    }
+}
