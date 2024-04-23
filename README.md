@@ -2,7 +2,7 @@
 
 - 🌱 I’m currently learning ... Azure Sentinel - KQL - and Log Analytics
 -
-- 📫 How to reach me ... tow2gunner@gmail.com or plewis@oig.doc.gov
+- 📫 How to reach me ... tow2gunner@gmail.com 
 
 <!---
 plewis-doc/plewis-doc is a ✨ special ✨ repository because its `README.md` (this file) appears on your GitHub profile.
